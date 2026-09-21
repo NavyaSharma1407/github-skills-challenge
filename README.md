@@ -90,6 +90,75 @@ messages:
 This indicates an incident or service degradation, likely tied to timeout conditions and resource saturation. The fact that the values return to normal afterward suggests the problem was transient and resolved quickly.
 
 
+
+
+# Task 3: Identify Anomalies
+
+Use the provided anomaly-detection component to analyse the operational data.
+
+The detection mechanism processes the dataset in chronological order and checks each observation against the configured thresholds:
+- response_time_threshold = 500 ms
+- cpu_threshold = 80%
+- memory_threshold = 80%
+
+The detector flags an observation as anomalous when any of these metric thresholds are exceeded and records the relevant reason(s). It also records a concerning log event when the observation has a log_level of ERROR.
+
+## Verified detection result
+
+The detection process processes all available operational records and identifies the abnormal observations as follows:
+
+### Anomaly 1
+- Timestamp: 2026-09-20T10:05:00
+- Service: payment-service
+- Metric information:
+  - response_time_ms = 610
+  - cpu_percent = 75
+  - memory_percent = 70
+- Log information:
+  - log_level = ERROR
+  - message = "Payment service timeout"
+- Why it was flagged:
+  - High response time
+  - Error log detected
+
+### Anomaly 2
+- Timestamp: 2026-09-20T10:06:00
+- Service: payment-service
+- Metric information:
+  - response_time_ms = 640
+  - cpu_percent = 94
+  - memory_percent = 91
+- Log information:
+  - log_level = ERROR
+  - message = "Database connection timeout"
+- Why it was flagged:
+  - High response time
+  - High CPU utilization
+  - High memory utilization
+  - Error log detected
+
+## Normal observations vs anomalous observations
+
+Normal observations are the records from 10:00, 10:01, 10:02, 10:03, 10:04, 10:07, 10:08 and 10:09, where:
+- response_time_ms stays around 120–150 ms
+- cpu_percent stays around 42–50%
+- memory_percent stays around 51–57%
+- log_level is INFO
+- message is "Payment request processed successfully"
+
+These are not flagged because they do not exceed the configured thresholds and do not include concerning error events.
+
+## Review summary
+- Anomalies detected: 2
+- Relevant metric/log information: response_time_ms, cpu_percent, memory_percent, log_level, message
+- Expected anomaly missed: none in the provided dataset
+- Normal event incorrectly flagged: none
+
+The detector produces a readable anomaly output that includes the timestamp, service, type, and list of reasons, which is sufficient to explain why each record was flagged.
+
+## Limitation / possible improvement
+A limitation of this approach is that it relies on fixed thresholds alone. It does not consider time-window correlation or cross-signal context, so a future improvement could be to require multiple related signals (for example high latency + elevated CPU/memory + ERROR log) before raising a high-confidence incident alert.
+
 ---
 
 &copy; 2025 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)
