@@ -11,6 +11,12 @@ Make sure your work is committed and pushed to your repository before submission
 
 Good luck!
 
+# Task 1: AIOps assessment
+
+This assessment monitors the application service and its supporting components as they process requests. The operational problem is identifying service degradation or outages quickly when alerts, logs, and performance signals are spread across multiple components.
+
+AIOps is used to collect and correlate those signals, detect meaningful anomalies, reduce alert noise, and help determine the likely cause of an incident. The workflow components provide the monitoring data, analysis, and response steps; they remain unchanged so the assessment can evaluate the scenario as provided.
+
 
 ---
 
