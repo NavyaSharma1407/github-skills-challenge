@@ -232,6 +232,47 @@ The corrected workflow now successfully validates the end-to-end event flow:
 
 This confirms that the issues were fixed within the original architecture and the AIOps event pipeline operates correctly again.
 
+
+
+
+
+# Task 6: Execute the End-to-End Pipeline
+
+After completing the investigation and corrections, the complete AIOps workflow was executed again to verify the full operational flow from telemetry through detection and event processing.
+
+## Verified end-to-end flow
+Operational Data → Anomaly Detection → Event → Producer → Topic → Consumer → AIOps
+
+This was validated successfully with the repository’s implementation:
+1. Operational data is processed.
+2. Anomalous behaviour is detected.
+3. An anomaly event is generated.
+4. The event is published.
+5. The event is consumed.
+6. The event is processed successfully.
+7. The final output represents the detected operational issue.
+
+## Execution evidence
+The workflow was run with:
+- python -m pytest -q tests/test_aiops_pipeline.py
+- PYTHONPATH=. python src/aiops_pipeline.py
+
+Fresh execution output confirms:
+- 4 tests passed
+- 10 records processed
+- 2 anomalies detected
+- 2 events consumed
+
+## Final output
+The final output represents the detected operational issue as follows:
+- 2026-09-20T10:05:00, payment-service, ANOMALY, Reasons: High response time, Error log detected
+- 2026-09-20T10:06:00, payment-service, ANOMALY, Reasons: High response time, High CPU utilization, High memory utilization, Error log detected
+
+This confirms the complete end-to-end pipeline is working correctly and no additional code fixes were required beyond the earlier corrections.
+
+
+
+
 ---
 
 &copy; 2025 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)
