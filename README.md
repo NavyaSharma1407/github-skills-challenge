@@ -273,6 +273,90 @@ This confirms the complete end-to-end pipeline is working correctly and no addit
 
 
 
+# Task 7: Update the README
+
+## Brief explanation of the AIOps scenario
+This project models a payment service that processes requests while generating operational telemetry. The goal is to monitor service health, detect abnormal behaviour, and correlate performance changes with log events so that a likely incident can be identified and routed downstream for investigation.
+
+## Description of the operational data
+The operational data is stored in data/service_data.json and contains one observation per minute for the payment-service. Each record includes:
+- timestamp
+- service
+- response_time_ms
+- cpu_percent
+- memory_percent
+- log_level
+- message
+
+This data provides both metric telemetry and operational log context for the same service over time.
+
+## Observations from the logs and metrics
+The steady-state records show healthy behaviour:
+- response_time_ms around 120–150 ms
+- cpu_percent around 42–50%
+- memory_percent around 51–57%
+- log_level = INFO
+- message = "Payment request processed successfully"
+
+The abnormal records are clearly different:
+- 2026-09-20T10:05:00: response_time_ms = 610, cpu_percent = 75, memory_percent = 70, log_level = ERROR, message = "Payment service timeout"
+- 2026-09-20T10:06:00: response_time_ms = 640, cpu_percent = 94, memory_percent = 91, log_level = ERROR, message = "Database connection timeout"
+
+These values indicate a service degradation and resource saturation event.
+
+## Anomaly-detection findings
+Using the provided anomaly detector, the workflow identifies two anomalous records:
+1. 2026-09-20T10:05:00
+   - High response time
+   - Error log detected
+2. 2026-09-20T10:06:00
+   - High response time
+   - High CPU utilization
+   - High memory utilization
+   - Error log detected
+
+These are the observations that exceed the configured thresholds and contain relevant error messages.
+
+## Event-processing flow
+The event-processing flow is:
+Operational Data → Anomaly Detection → Event → Producer → Topic → Consumer → AIOps
+
+The producer publishes anomaly events to an in-memory topic, and the consumer reads the same topic so the downstream AIOps component receives the processed anomaly output.
+
+## Result of the final workflow execution
+Fresh workflow execution confirmed:
+- 10 records processed
+- 2 anomalies detected
+- 2 events consumed
+
+Detected events:
+- 2026-09-20T10:05:00, payment-service, ANOMALY, Reasons: High response time, Error log detected
+- 2026-09-20T10:06:00, payment-service, ANOMALY, Reasons: High response time, High CPU utilization, High memory utilization, Error log detected
+
+## Issues identified and corrected
+The workflow originally had three issues:
+1. The detector checked for WARNING instead of ERROR, so relevant timeout log events were not included.
+2. The producer and consumer were using different topics, so events were never consumed.
+3. The project imports were incompatible with package-based execution in the test environment.
+
+Each issue was corrected within the existing architecture without replacing the detection flow or event-processing design.
+
+## Limitation / possible improvement
+The implemented detection approach relies on fixed thresholds. A useful improvement would be to add stronger correlation logic so that an incident is only raised when multiple signals align together (such as high latency, high resource use, and an ERROR log within the same time window).
+
+## Reproduction steps
+To reproduce the demonstration on another machine:
+1. Open the project directory.
+2. Ensure Python is installed.
+3. Run the unit tests:
+   python -m pytest -q tests/test_aiops_pipeline.py
+4. Run the full workflow:
+   PYTHONPATH=. python src/aiops_pipeline.py
+5. Review the printed summary to confirm the number of processed records and consumed anomalies.
+6. Compare the output with the identified anomaly timestamps and reasons above.
+
+This reproduces the same operational analysis, anomaly detection, and event-flow path demonstrated in this project.
+
 ---
 
 &copy; 2025 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)
