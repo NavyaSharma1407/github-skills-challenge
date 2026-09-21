@@ -13,9 +13,19 @@ Good luck!
 
 # Task 1: AIOps assessment
 
-This assessment monitors the application service and its supporting components as they process requests. The operational problem is identifying service degradation or outages quickly when alerts, logs, and performance signals are spread across multiple components.
+## Scenario and component purposes
 
-AIOps is used to collect and correlate those signals, detect meaningful anomalies, reduce alert noise, and help determine the likely cause of an incident. The workflow components provide the monitoring data, analysis, and response steps; they remain unchanged so the assessment can evaluate the scenario as provided.
+The scenario represents an application handling requests through several supporting services. A degradation in one component can affect the entire request path, while producing separate alerts, log entries, and performance changes. The goal is to identify the impact quickly, correlate related symptoms, and guide an effective response.
+
+ the major components have these purposes:
+
+- Application service: Handles incoming requests and provides the user-facing functionality being monitored.
+- Supporting components: Supply dependencies such as data, messaging, or infrastructure needed by the application; failures here can cause downstream impact.
+- Monitoring and telemetry: Collects metrics, logs, traces, and health signals from the application and its dependencies.
+- Alerting: Detects threshold breaches or unhealthy states and notifies operators of potential incidents.
+- AIOps analysis: Correlates signals across components, identifies anomalies, suppresses duplicate noise, and helps determine the likely root cause.
+- Response workflow: Uses the analysis to prioritize the incident, investigate the affected component, and coordinate remediation and recovery.
+
 
 
 ---
