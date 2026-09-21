@@ -159,7 +159,45 @@ The detector produces a readable anomaly output that includes the timestamp, ser
 ## Limitation / possible improvement
 A limitation of this approach is that it relies on fixed thresholds alone. It does not consider time-window correlation or cross-signal context, so a future improvement could be to require multiple related signals (for example high latency + elevated CPU/memory + ERROR log) before raising a high-confidence incident alert.
 
+
+
+
+
+
+
+# Task 4: Verify the AIOps Event Flow
+
+The repository contains a lightweight event-stream simulation for anomaly propagation. This workflow validates that a detected anomaly is transformed into an event, passed to the producer, published to the topic, consumed, and then made available to downstream AIOps processing.
+
+## Components and roles
+- Producer: emits the anomaly event to the topic.
+- Topic: stores and distributes the event to subscribers.
+- Consumer: reads events from the topic.
+- Event/message: the structured payload containing anomaly details.
+
+## Verified event flow
+The workflow confirms the following:
+1. An anomaly identified by the detection process results in an event.
+2. The event is passed to the producer.
+3. The producer publishes the event to the appropriate topic.
+4. The consumer receives the event from the topic.
+5. The consumer processes the received event.
+6. The processed event reaches the downstream AIOps component.
+
+## Execution result
+Running the provided workflow produces the following result:
+- Records processed: 10
+- Anomalies detected: 2
+- Events consumed: 2
+
+The detected anomaly events are:
+- 2026-09-20T10:05:00, payment-service, ANOMALY, Reasons: High response time, Error log detected
+- 2026-09-20T10:06:00, payment-service, ANOMALY, Reasons: High response time, High CPU utilization, High memory utilization, Error log detected
+
+This confirms that the anomaly event successfully traveled through the complete event-processing pipeline and was available to the downstream component.
+
 ---
 
 &copy; 2025 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)
+
 
