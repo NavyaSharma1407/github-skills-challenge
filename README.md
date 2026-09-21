@@ -196,6 +196,42 @@ The detected anomaly events are:
 
 This confirms that the anomaly event successfully traveled through the complete event-processing pipeline and was available to the downstream component.
 
+
+
+
+
+
+# Task 5: Investigate and Correct the Workflow
+
+The assessment environment contained a small number of issues that prevented the AIOps workflow from operating as expected. These problems were investigated and corrected within the existing architecture without replacing the provided components.
+
+## Problem 1: Incorrect log condition in the detector
+- Affected component: anomaly detector
+- Cause: the detector checked for log_level == "WARNING" instead of the real concerning condition, which is ERROR.
+- Correction: updated the detector to treat ERROR log entries as anomalous and include "Error log detected" in the event reasons.
+- Verification: the pipeline now includes the relevant timeout log entries in the anomaly reasons for the 10:05 and 10:06 observations.
+
+## Problem 2: Producer and consumer were connected to different topics
+- Affected component: AIOps pipeline
+- Cause: the pipeline created separate topic instances for publishing and consuming, so the event never reached the consumer.
+- Correction: the workflow now uses a shared anomaly-events topic for both publish and consume operations.
+- Verification: the final workflow consumes the same events that were published, producing 2 consumed events matching the 2 detected anomalies.
+
+## Problem 3: Module import compatibility issue
+- Affected component: pipeline import path
+- Cause: the workflow used direct imports that failed when the project was executed in a package/test-aware environment.
+- Correction: added compatible fallback imports so the existing architecture works both as a script and when imported via the package path.
+- Verification: the test suite and execution workflow both run successfully.
+
+## Execution verification
+The corrected workflow now successfully validates the end-to-end event flow:
+- 4 tests passed
+- 10 records processed
+- 2 anomalies detected
+- 2 events consumed
+
+This confirms that the issues were fixed within the original architecture and the AIOps event pipeline operates correctly again.
+
 ---
 
 &copy; 2025 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)

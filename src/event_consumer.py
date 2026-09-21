@@ -1,4 +1,7 @@
-from event_topic import EventTopic
+try:
+    from event_topic import EventTopic
+except ModuleNotFoundError:
+    from src.event_topic import EventTopic
 
 
 class EventConsumer:
